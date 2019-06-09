@@ -1,0 +1,46 @@
+import requests
+import urllib3
+
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+BASEURL = 'https://24882df0152e67b8d4a835e0e71d5d8f844c463f.peers.subut.ai:41859'
+
+s = requests.Session()
+
+payload = {"username": "Keith", "password": "SUPER-SECRET"}
+resp = s.post(BASEURL + '/login', data=payload, verify=False)
+
+if resp.status_code != 200:
+    print('Failed /login/ {}'.format(resp.status_code))
+    exit()
+
+print('Login OK')
+
+print('Environments:')
+
+resp = s.get(BASEURL + '/rest/v1/environments')
+
+if resp.status_code != 200:
+    print('Failed GET /environments/ {}'.format(resp.status_code))
+
+print(resp.json())
+
+payload = {
+  'topology': '{ "name": "super", "nodes": [ { "hostname": "maximus", "templateName": "debian-stretch" } ] }'
+}
+
+print('Create:')
+
+headers = {'Content-type': 'application/x-www-form-urlencoded', 'Accept': 'text/plain'}
+resp = s.post(BASEURL + '/rest/v1/environments'
+                , data=payload
+                , verify=False)
+#              , headers=headers)
+
+if resp.status_code != 200:
+    print('CREATE /environments/ {} {}'.format(resp.status_code, resp.text))
+else:
+    print('Success')
+
+
+
